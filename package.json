@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.18.0",
-    "node-forge": "^0.7.6"
+    "node-forge": "^0.7.6",
+    "request": "^2.88.0"
   }
 }
