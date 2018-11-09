@@ -27,9 +27,7 @@ function getCertificateInfo(host) {
 		const req = https.request({
 			host,
 			port: 443,
-			path: '/',
 			method: 'GET',
-			rejectUnauthorized: false
 		}, res => {
 			resolve(res.connection.getPeerCertificate())
 		})
@@ -111,17 +109,11 @@ async function createFakeCertificate(domain) {
 		if (fs.existsSync(certPath) && fs.existsSync(keyPath)) {
 			const keyPem = fs.readFileSync(keyPath).toString()
 			const certPem = fs.readFileSync(certPath).toString()
-			console.log({
-				key: pki.privateKeyFromPem(keyPem),
-				cert: pki.certificateFromPem(certPem),
-				keyPem,
-				certPath,
-			})
 			return {
 				key: pki.privateKeyFromPem(keyPem),
 				cert: pki.certificateFromPem(certPem),
 				keyPem,
-				certPath,
+				certPem,
 			}
 		}
 
@@ -135,7 +127,7 @@ async function createFakeCertificate(domain) {
 			const keys = pki.rsa.generateKeyPair(2048)
 			const cert = pki.createCertificate()
 			cert.publicKey = keys.publicKey
-			cert.serialNumber = '01'
+			// cert.serialNumber = '01'
 
 			// 设置有效时间
 			cert.validity.notBefore = new Date()
@@ -143,46 +135,40 @@ async function createFakeCertificate(domain) {
 			cert.validity.notBefore.setFullYear(cert.validity.notBefore.getFullYear())
 			cert.validity.notAfter.setFullYear(cert.validity.notAfter.getFullYear() + 1)
 
-			const { subject, issuer } = await getCertificateInfo(domain)
+			// const { subject, issuer } = await getCertificateInfo(domain)
 
-			// const subject = { C: 'CN',
-			// 	ST: 'beijing',
-			// 	L: 'beijing',
-			// 	OU: 'service operation department',
-			// 	O: 'Beijing Baidu Netcom Science Technology Co., Ltd',
-			// 	CN: 'baidu.com' }
-
-			// const subject = [
-			// 	{
-			// 		name: 'commonName',
-			// 		value: domain
-			// 	}, {
-			// 		name: 'countryName',
-			// 		value: 'CN'
-			// 	}, {
-			// 		shortName: 'ST',
-			// 		value: 'GuangDong'
-			// 	}, {
-			// 		name: 'localityName',
-			// 		value: 'ShengZhen'
-			// 	}, {
-			// 		name: 'organizationName',
-			// 		value: 'sjy'
-			// 	}, {
-			// 		shortName: 'OU',
-			// 		value: 'sjy'
-			// 	}
-			// ]
+			const subject = [
+				{
+					name: 'commonName',
+					value: domain
+				}, {
+					name: 'countryName',
+					value: 'CN'
+				}, {
+					shortName: 'ST',
+					value: 'GuangDong'
+				}, {
+					name: 'localityName',
+					value: 'ShengZhen'
+				}, {
+					name: 'organizationName',
+					value: 'sjy'
+				}, {
+					shortName: 'OU',
+					value: 'sjy'
+				}
+			]
 
 			// 设置发行者为根证书
 			cert.setIssuer(caCert.subject.attributes)
 			// 设置提供给站点的信息
 			cert.setSubject(subject)
-			cert.setExtensions([{
-				name: 'basicConstraints',
-				critical: true,
-				cA: false
-			},
+			cert.setExtensions([
+				{
+					name: 'basicConstraints',
+					critical: true,
+					cA: false
+				},
 				{
 					name: 'keyUsage',
 					critical: true,
@@ -215,8 +201,9 @@ async function createFakeCertificate(domain) {
 					timeStamping: true
 				},
 				{
-					name: 'authorityKeyIdentifier'
-				}])
+					name:'authorityKeyIdentifier'
+				}
+			])
 
 			// 用CA根证书私钥签名 生成子证书
 			cert.sign(caKey, forge.md.sha256.create())

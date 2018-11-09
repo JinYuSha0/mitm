@@ -1,20 +1,15 @@
 const https = require('https')
-const tls = require('tls')
+const url = require('url')
+const axios = require('axios')
 const createFakeCertificate = require('./createFakeCertificate')
 
 async function createFakeHttpsWebSite(domain, successFunc) {
 	try {
 		const fakeCertObj = await createFakeCertificate(domain)
 
-		const fakeServer = new https.Server({
-			key: fakeCertObj.key,
-			cert: fakeCertObj.cert,
-			SNICallback: (hostname, done) => {
-				done(null, tls.createSecureContext({
-					key: fakeCertObj.keyPem,
-					cert: fakeCertObj.certPem
-				}))
-			}
+		const fakeServer = new https.createServer({
+			key: fakeCertObj.keyPem,
+			cert: fakeCertObj.certPem,
 		})
 
 		fakeServer.listen(0, () => {
@@ -22,7 +17,7 @@ async function createFakeHttpsWebSite(domain, successFunc) {
 			successFunc(address.port)
 		})
 
-		fakeServer.on('request', (req, res) => {
+		fakeServer.on('request', async (req, res) => {
 			const urlObject = url.parse(req.url)
 			let options = {
 				protocol: 'https:',
@@ -33,7 +28,7 @@ async function createFakeHttpsWebSite(domain, successFunc) {
 				headers: req.headers
 			}
 			res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'})
-			res.write(`<html><body>我是伪造的: ${options.protocol}//${options.hostname} 站点</body></html>`)
+			res.write(`<html><body>我是伪造的站点: ${JSON.stringify(options)}</body></html>`)
 			res.end()
 		})
 
