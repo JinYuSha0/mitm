@@ -23,7 +23,11 @@ module.exports = (req, res) => {
 			method: req.method,
 			url: protocol + '//' + req.headers.host.split(':')[0] + urlObject.path,
 			headers: req.headers,
-			gzip: true,
+			// gzip: true,
+		}, (error, response, body) => {
+			if (error) {
+				res.end()
+			}
 		})
 
 		readStream.pipe(res)
