@@ -4,7 +4,7 @@ const forge = require('node-forge')
 const https = require('https')
 
 const pki = forge.pki
-const sslDir = path.resolve('../ssl')
+const sslDir = path.resolve(__dirname, '../../ssl')
 const caCertPath = path.join(sslDir, '/rootCA.crt')
 const caKeyPath = path.join(sslDir, '/rootCA.key.pem')
 

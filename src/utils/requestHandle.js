@@ -26,11 +26,11 @@ module.exports = (req, res) => {
 				'Content-Type': 'application/force-download',
 				'Content-Disposition': 'attachment; filename=CA.cert'
 			})
-			fs.createReadStream(path.resolve('../ssl/rootCA.crt')).pipe(res)
+			fs.createReadStream(path.resolve(__dirname, '../../ssl/rootCA.crt')).pipe(res)
 		} else {
 			const readStream = request({
 				method: req.method,
-				url: protocol + '//' + req.headers.host.split(':')[0] + urlObject.path,
+				url: protocol + '//' + req.headers.host + urlObject.path,
 				headers: req.headers,
 				// gzip: true,
 			}, (error, response, body) => {
