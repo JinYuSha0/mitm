@@ -1,11 +1,15 @@
 const http = require('http')
 const url = require('url')
 const net = require('net')
-const requestHandle = require('./requestHandle')
+const requestHandle = require('./utils/requestHandle')
 const createFakeHttpsWebSite = require('./utils/createFakeHttpsWebSite')
+const { createFakeCaCertificate } = require('./utils/createFakeCertificate')
 
 let httpTunnel = new http.createServer(requestHandle)
 let port = 1111
+
+// 创建ca证书
+createFakeCaCertificate()
 
 httpTunnel.listen(port, () => {
 	console.log(`HTTPS中间人代理启动成功，端口${port}`)

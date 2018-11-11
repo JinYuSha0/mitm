@@ -44,60 +44,62 @@ function getCertificateInfo(host) {
 
 // 生成CA根证书
 function createFakeCaCertificate() {
-	const keys = pki.rsa.generateKeyPair(2048)
-	const cert = pki.createCertificate()
-	cert.publicKey = keys.publicKey
+	if (!fs.existsSync(caCertPath) && !fs.existsSync(caKeyPath)) {
+		const keys = pki.rsa.generateKeyPair(2048)
+		const cert = pki.createCertificate()
+		cert.publicKey = keys.publicKey
 
-	// 设置有效时间
-	cert.validity.notBefore = new Date()
-	cert.validity.notAfter = new Date()
-	cert.validity.notBefore.setFullYear(cert.validity.notBefore.getFullYear())
-	cert.validity.notAfter.setFullYear(cert.validity.notAfter.getFullYear() + 1)
+		// 设置有效时间
+		cert.validity.notBefore = new Date()
+		cert.validity.notAfter = new Date()
+		cert.validity.notBefore.setFullYear(cert.validity.notBefore.getFullYear())
+		cert.validity.notAfter.setFullYear(cert.validity.notAfter.getFullYear() + 1)
 
-	const attrs = [
-		{
-			name: 'commonName',
-			value: 'sjy-self-use'
+		const attrs = [
+			{
+				name: 'commonName',
+				value: 'sjy-self-use'
+			}, {
+				name: 'countryName',
+				value: 'CN'
+			}, {
+				shortName: 'ST',
+				value: 'GuangDong'
+			}, {
+				name: 'localityName',
+				value: 'ShenZhen'
+			}, {
+				name: 'organizationName',
+				value: 'sjy'
+			}, {
+				shortName: 'OU',
+				value: 'sjy'
+			}
+		]
+
+		cert.setSubject(attrs)
+		cert.setIssuer(attrs)
+		cert.setExtensions([{
+			name: 'basicConstraints',
+			critical: true,
+			cA: true
 		}, {
-			name: 'countryName',
-			value: 'CN'
+			name: 'keyUsage',
+			critical: true,
+			keyCertSign: true
 		}, {
-			shortName: 'ST',
-			value: 'GuangDong'
-		}, {
-			name: 'localityName',
-			value: 'ShenZhen'
-		}, {
-			name: 'organizationName',
-			value: 'sjy'
-		}, {
-			shortName: 'OU',
-			value: 'sjy'
-		}
-	]
+			name: 'subjectKeyIdentifier'
+		}])
 
-	cert.setSubject(attrs)
-	cert.setIssuer(attrs)
-	cert.setExtensions([{
-		name: 'basicConstraints',
-		critical: true,
-		cA: true
-	}, {
-		name: 'keyUsage',
-		critical: true,
-		keyCertSign: true
-	}, {
-		name: 'subjectKeyIdentifier'
-	}])
+		// 用自己的私钥签名
+		cert.sign(keys.privateKey, forge.md.sha256.create())
 
-	// 用自己的私钥签名
-	cert.sign(keys.privateKey, forge.md.sha256.create())
+		const certPem = pki.certificateToPem(cert)
+		const keyPem = pki.privateKeyToPem(keys.privateKey)
 
-	const certPem = pki.certificateToPem(cert)
-	const keyPem = pki.privateKeyToPem(keys.privateKey)
-
-	fs.writeFileSync(caCertPath, certPem)
-	fs.writeFileSync(caKeyPath, keyPem)
+		fs.writeFileSync(caCertPath, certPem)
+		fs.writeFileSync(caKeyPath, keyPem)
+	}
 }
 
 // 生成子证书
@@ -229,4 +231,7 @@ async function createFakeCertificate(domain) {
 	}
 }
 
-module.exports = createFakeCertificate
+module.exports = {
+	createFakeCaCertificate,
+	createFakeCertificate,
+}

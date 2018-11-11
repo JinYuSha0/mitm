@@ -1,5 +1,5 @@
 const https = require('https')
-const createFakeCertificate = require('./createFakeCertificate')
+const { createFakeCertificate } = require('./createFakeCertificate')
 
 async function createFakeHttpsWebSite(domain, requestHandle, successFunc) {
 	try {
