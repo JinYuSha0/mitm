@@ -1,24 +1,39 @@
 const url = require('url')
+const querystring = require('querystring')
 
 // 获取请求参数
-module.exports = (req, res, useStream = true) => {
+module.exports = (req, res) => {
 	const urlObject = url.parse(req.url)
 	const protocol = urlObject.protocol || 'https:'
-
 	const URL = protocol + '//' + req.headers.host + urlObject.path
-	let headers = Object.create(null)
-	if (!useStream) {
-		// 不使用流的方式 去掉请求头中的 Accept-Encoding 防止返回内容编码压缩
-		Object.keys(req.headers).forEach(k => {
-			if (!String.prototype.toLowerCase.call(k).match(/accept-encoding/)) {
-				headers[k] = req.headers[k]
-			}
-		})
-	}
-
-	return {
+	const defalutOptions = {
 		method: req.method,
 		url: URL,
-		headers,
+		headers: req.headers,
+		encoding: null,
+	}
+
+	if (req.method.toLowerCase() === 'get') {
+		return defalutOptions
+	} else {
+		let body = ''
+		req.on('data', chunk => {
+			body += chunk
+		})
+		req.on('end', () => {
+			body = querystring.parse(body)
+			const params = Object.create(null)
+			const contentType = req.headers['content-type']
+			if (contentType && body != null) {
+				if (contentType.match('application/json')) {
+					Object.assign(params, { body })
+				} else if (contentType.match('application/x-www-form-urlencoded')) {
+					Object.assign(params, { form: body })
+				} else if (contentType.match('multipart/form-data')) {
+					Object.assign(params, { formData: body })
+				}
+			}
+			return Object.assign(defalutOptions, { ...params })
+		})
 	}
 }
