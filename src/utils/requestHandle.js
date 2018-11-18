@@ -39,9 +39,14 @@ module.exports = (req, res) => {
 					body = await decode(encode, body)
 				}
 				if (response) {
-					// fixme
-					delete response.headers['content-encoding']
-					res.writeHead(response.statusCode, response.headers)
+					// 为什么要去这两个头
+					// 1.content-encoding：因为代理已经解码过了 不需要浏览器再次解码
+					// 2.content-length：因为解压前的长度比解压后的长度小，会导致原内容丢失
+					// 浅拷贝 response.headers
+					const headers = Object.assign({}, response.headers)
+					delete headers['content-encoding']
+					delete headers['content-length']
+					res.writeHead(response.statusCode, headers)
 					if (body) {
 						body = injectScript(body, `/${randomPath}/inject.js`)
 						res.end(body)
@@ -51,8 +56,12 @@ module.exports = (req, res) => {
 				}
 			})
 		} else {
-			// 其余请求走流的形式
-			request(getRequestOptions(req, res)).pipe(res)
+			// 其余请求走字节流的形式
+            request(getRequestOptions(req, res), (err, response, body) => {
+                if (err) {
+                    res.end()
+                }
+            }).pipe(res)
 		}
 	} catch (e) {
 		res.end()

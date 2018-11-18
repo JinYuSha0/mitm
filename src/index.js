@@ -6,7 +6,7 @@ const createFakeHttpsWebSite = require('./utils/createFakeHttpsWebSite')
 const { createFakeCaCertificate } = require('./utils/createFakeCertificate')
 
 let httpTunnel = new http.createServer(requestHandle)
-httpTunnel.timeout = httpTunnel.keepAliveTimeout = 20000
+httpTunnel.timeout = httpTunnel.keepAliveTimeout = 30000
 let port = 1111
 
 // 创建ca证书

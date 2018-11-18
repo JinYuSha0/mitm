@@ -4,7 +4,7 @@ const querystring = require('querystring')
 // 获取请求参数
 module.exports = (req, res) => {
 	const urlObject = url.parse(req.url)
-	const protocol = urlObject.protocol || 'https:'
+	const protocol = !!req.connection.encrypted ? 'https:' : 'http:'
 	const URL = protocol + '//' + req.headers.host + urlObject.path
 	const defalutOptions = {
 		method: req.method,

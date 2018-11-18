@@ -1,7 +1,8 @@
-const {} = require('stream')
-
 // 注入脚本
-function injectScript(content, scriptSrc) {
+module.exports = function injectScript(content, scriptSrc) {
+	if (Object.getPrototypeOf(content) !== String.prototype) {
+		return content
+	}
 	const reg = new RegExp(/([\s\S]+)<\/body>([\s\S]+)/)
 	const match = content.match(reg)
 	if (match) {
@@ -20,5 +21,3 @@ function injectScript(content, scriptSrc) {
 		return content
 	}
 }
-
-module.exports = injectScript
