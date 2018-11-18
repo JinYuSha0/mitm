@@ -14,7 +14,7 @@ module.exports = (req, res) => {
 			// 定义一个域名下载根证书便于安装
 			res.writeHead(200, {
 				'Content-Type': 'application/force-download',
-				'Content-Disposition': 'attachment; filename=CA.cert'
+				'Content-Disposition': 'attachment; filename=CA.crt'
 			})
 			fs.createReadStream(path.resolve(__dirname, '../../ssl/rootCA.crt')).pipe(res)
 		} else if (!!req.url.match(randomPath)) {
