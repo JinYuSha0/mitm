@@ -47,13 +47,14 @@ module.exports = async (req, res) => {
             }
           }
           if (response) {
-            // 为什么要去这两个头
+            // 为什么要去这三个头
             // 1.content-encoding：因为代理已经解码过了 不需要浏览器再次解码
             // 2.content-length：因为解压前的长度比解压后的长度小，会导致原内容丢失
-            // 浅拷贝 response.headers
+            // 3.content-security-policy：内容安全策略(CSP) 会影响脚本注入 https://www.jianshu.com/p/a8b769e7d4bd
             const headers = Object.assign({}, response.headers)
             delete headers['content-encoding']
             delete headers['content-length']
+            delete headers['content-security-policy']
             res.writeHead(response.statusCode, headers)
             if (body) {
               body = injectScript(body, `/${randomPath}/inject.js`)
