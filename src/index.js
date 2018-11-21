@@ -1,9 +1,9 @@
 const http = require('http')
 const url = require('url')
 const net = require('net')
-const requestHandle = require('./utils/requestHandle')
-const createFakeHttpsWebSite = require('./utils/createFakeHttpsWebSite')
-const {createFakeCaCertificate} = require('./utils/createFakeCertificate')
+const requestHandle = require('./requestHandle')
+const createFakeHttpsWebSite = require('./createFakeHttpsWebSite')
+const {createFakeCaCertificate} = require('./createFakeCertificate')
 
 let httpTunnel = new http.createServer(requestHandle)
 httpTunnel.timeout = httpTunnel.keepAliveTimeout = 30000

@@ -2,9 +2,9 @@ const fs = require('fs')
 const url = require('url')
 const path = require('path')
 const request = require('request')
-const getRequestOptions = require('./getRequestOptions')
-const decode = require('./decode')
-const injectScript = require('./injectScript')
+const getRequestOptions = require('./utils/getRequestOptions')
+const decode = require('./utils/decode')
+const injectScript = require('./utils/injectScript')
 
 const randomPath = Math.random().toString(36).split('.')[1]
 
@@ -16,12 +16,12 @@ module.exports = async (req, res) => {
         'Content-Type': 'application/force-download',
         'Content-Disposition': 'attachment; filename=CA.crt'
       })
-      fs.createReadStream(path.resolve(__dirname, '../../ssl/rootCA.crt')).pipe(res)
+      fs.createReadStream(path.resolve(__dirname, '../ssl/rootCA.crt')).pipe(res)
     } else if (!!req.url.match(randomPath)) {
       // 返回静态资源
       const splits = url.parse(req.url).pathname.split('/')
       const fileName = splits[splits.length - 1]
-      const filePath = path.resolve(__dirname, `../../static/js/${fileName}`)
+      const filePath = path.resolve(__dirname, `../static/js/${fileName}`)
       if (fs.existsSync(filePath)) {
         fs.createReadStream(filePath).pipe(res)
       } else {
