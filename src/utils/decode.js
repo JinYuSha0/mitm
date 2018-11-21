@@ -4,19 +4,31 @@ const iltorb = require('iltorb')
 const decode = {
   gzip: (body) => {
     return new Promise((resolve, reject) => {
-      if (!body) reject('body is null')
+      if (body == null) reject('body is null')
       zlib.gunzip(body, (err, dezipped) => {
         if (err || dezipped == null) {
-          reject(err || new Error('dezipped is null'))
+          reject(err || new Error('decide(gzip) is null'))
           return
         }
         resolve(dezipped.toString())
       })
     })
   },
+  deflate: (body) => {
+    return new Promise((resolve, reject) => {
+      if (body == null) reject('body is null')
+      zlib.inflateRaw(body, (err, decode) => {
+        if (err || decode == null) {
+          reject(err || new Error('decode(deflate) is null'))
+          return
+        }
+        resolve(decode.toString())
+      })
+    })
+  },
   brotli: (body) => {
     return new Promise((resolve, reject) => {
-      if (!body) reject('body is null')
+      if (body == null) reject('body is null')
       iltorb.decompress(body).then(value => {
         resolve(value.toString())
       }).catch(err => {
@@ -24,18 +36,6 @@ const decode = {
       })
     })
   },
-  deflate: (body) => {
-    return new Promise((resolve, reject) => {
-      if (!body) reject('body is null')
-      zlib.inflate(body, (err, dedeflate) => {
-        if (err || dedeflate == null) {
-          reject(err || new Error('dedeflate is null'))
-          return
-        }
-        resolve(dedeflate)
-      })
-    })
-  }
 }
 
 // chrome Accept-Encoding: gzip, deflate, br

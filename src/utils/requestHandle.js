@@ -36,7 +36,13 @@ module.exports = (req, res) => {
         // 判断返回头中的content-encoding 选择解码方式
         const encode = response.headers['content-encoding']
         if (encode) {
-          body = await decode(encode, body)
+          try {
+            body = await decode(encode, body)
+          } catch (err) {
+            res.writeHead(500)
+            res.end('Decode Error')
+            throw err
+          }
         }
         if (response) {
           // 为什么要去这两个头
@@ -51,7 +57,7 @@ module.exports = (req, res) => {
             body = injectScript(body, `/${randomPath}/inject.js`)
             res.end(body)
           } else {
-            res.end()
+            res.end('No Response Body')
           }
         }
       })
