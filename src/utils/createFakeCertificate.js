@@ -5,6 +5,7 @@ const https = require('https')
 
 const pki = forge.pki
 const sslDir = path.resolve(__dirname, '../../ssl')
+const otherDir = path.join(sslDir, '/other')
 const caCertPath = path.join(sslDir, '/rootCA.crt')
 const caKeyPath = path.join(sslDir, '/rootCA.key.pem')
 
@@ -44,6 +45,11 @@ function getCertificateInfo(host) {
 
 // 生成CA根证书
 function createFakeCaCertificate() {
+	// 创建目录
+	if (!fs.existsSync(sslDir)) {
+		fs.mkdirSync(sslDir)
+	}
+
 	if (!fs.existsSync(caCertPath) && !fs.existsSync(caKeyPath)) {
 		const keys = pki.rsa.generateKeyPair(2048)
 		const cert = pki.createCertificate()
@@ -105,8 +111,13 @@ function createFakeCaCertificate() {
 // 生成子证书
 async function createFakeCertificate(domain) {
 	try {
-		const certPath = path.join(sslDir, `/other/cert_${domain}.crt`)
-		const keyPath = path.join(sslDir, `/other/key_${domain}.pem`)
+		// 创建目录
+		if (!fs.existsSync(otherDir)) {
+			fs.mkdirSync(otherDir)
+		}
+
+		const certPath = path.join(otherDir, `/cert_${domain}.crt`)
+		const keyPath = path.join(otherDir, `/key_${domain}.pem`)
 
 		if (fs.existsSync(certPath) && fs.existsSync(keyPath)) {
 			const keyPem = fs.readFileSync(keyPath).toString()

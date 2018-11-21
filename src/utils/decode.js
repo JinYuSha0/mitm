@@ -19,6 +19,7 @@ module.exports = async (encode, body) => {
 		case 'gzip':
 			return (await gzip(body))
 		case 'br': // Brotli
+			console.log(brotli.decompress(body).toString())
 			return brotli.decompress(body)
 		case 'deflate':
 			return body
