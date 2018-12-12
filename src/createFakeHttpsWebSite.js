@@ -1,4 +1,5 @@
 const https = require('https')
+const websocket = require('./websocket')
 const {createFakeCertificate} = require('./createFakeCertificate')
 
 async function createFakeHttpsWebSite(domain, requestHandle, successFunc) {
@@ -15,10 +16,12 @@ async function createFakeHttpsWebSite(domain, requestHandle, successFunc) {
       successFunc(address.port)
     })
 
+    websocket(fakeServer)
+
     fakeServer.on('request', requestHandle)
 
     fakeServer.on('error', (e) => {
-      console.error(e);
+      console.error(e)
     })
   } catch (err) {
     // throw err

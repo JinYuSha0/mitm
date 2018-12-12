@@ -1,13 +1,14 @@
 const http = require('http')
 const url = require('url')
 const net = require('net')
+const websocket = require('./websocket')
 const requestHandle = require('./requestHandle')
 const createFakeHttpsWebSite = require('./createFakeHttpsWebSite')
 const {createFakeCaCertificate} = require('./createFakeCertificate')
 
-let httpTunnel = new http.createServer(requestHandle)
+const httpTunnel = new http.createServer(requestHandle)
 httpTunnel.timeout = httpTunnel.keepAliveTimeout = 30000
-let port = 1111
+const port = 1111
 
 // 创建ca证书
 createFakeCaCertificate()
@@ -15,6 +16,8 @@ createFakeCaCertificate()
 httpTunnel.listen(port, () => {
   console.log(`HTTPS中间人代理启动成功，端口${port}`)
 })
+
+websocket(httpTunnel)
 
 httpTunnel.on('error', (e) => {
   if (e.code == 'EADDRINUSE') {

@@ -5,8 +5,9 @@ const request = require('request')
 const getRequestOptions = require('./utils/getRequestOptions')
 const decode = require('./utils/decode')
 const injectScript = require('./utils/injectScript')
+const utils = require('./utils/utils')
 
-const randomPath = Math.random().toString(36).split('.')[1]
+const randomPath = utils.randomStr()
 
 module.exports = async (req, res) => {
   try {
