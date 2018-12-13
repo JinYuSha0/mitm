@@ -85,7 +85,8 @@ if (self == top) {
       }
       ws.send(new Blob([PayloadType, PayloadData]))
     }
-    const ws = window.ws = new WebSocket(`ws://${document.domain}/ws`)
+    const isSSL = document.location.href.match(/https/ig)
+    const ws = window.ws = new WebSocket(`${isSSL ? 'wss' : 'ws'}://${document.domain}/ws`)
 
     ws.onopen = () => {
       console.log('websocket连接')
