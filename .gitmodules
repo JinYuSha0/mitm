@@ -2,3 +2,6 @@
 [submodule "packages/mitm-node-websocket"]
 	path = packages/mitm-node-websocket
 	url = https://github.com/JinYuSha0/node-websocket
+[submodule "packages/system-basic-command"]
+	path = packages/system-basic-command
+	url = https://github.com/JinYuSha0/system-basic-command.git
