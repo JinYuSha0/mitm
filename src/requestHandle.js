@@ -21,8 +21,8 @@ module.exports = async (req, res) => {
     } else if (!!req.url.match(randomPath)) {
       // 返回静态资源
       const splits = url.parse(req.url).pathname.split('/')
-      const fileName = splits[splits.length - 1]
-      const filePath = path.resolve(__dirname, `../static/js/${fileName}`)
+      const fileName = splits.slice(2, splits.length).join('/')
+      const filePath = path.resolve(__dirname, `../static/${fileName}`)
       if (fs.existsSync(filePath)) {
         fs.createReadStream(filePath).pipe(res)
       } else {
@@ -36,18 +36,20 @@ module.exports = async (req, res) => {
           if (error) {
             res.end()
           }
+
           // 判断返回头中的content-encoding 选择解码方式
-          const encode = response.headers['content-encoding']
-          if (encode) {
-            try {
-              body = await decode(encode, body)
-            } catch (err) {
-              res.writeHead(500)
-              res.end('Decode Error')
-              throw err
-            }
-          }
           if (response) {
+            const encode = response.headers['content-encoding']
+            if (encode) {
+              try {
+                body = await decode(encode, body)
+              } catch (err) {
+                res.writeHead(500)
+                res.end('Decode Error')
+                throw err
+              }
+            }
+
             // 为什么要去这三个头
             // 1.content-encoding：因为代理已经解码过了 不需要浏览器再次解码
             // 2.content-length：因为解压前的长度比解压后的长度小，会导致原内容丢失
@@ -58,7 +60,7 @@ module.exports = async (req, res) => {
             delete headers['content-security-policy']
             res.writeHead(response.statusCode, headers)
             if (body) {
-              body = injectScript(body, [`/${randomPath}/inject.js`])
+              body = injectScript(body, [`/${randomPath}/js/inject.js`])
               res.end(body)
             } else {
               res.end('No Response Body')

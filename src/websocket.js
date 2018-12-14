@@ -19,7 +19,7 @@ module.exports = (server) => {
   WebSocket.prototype.handlerFunc = (socket, req) => {
     socket.on('package', () => {
       wss.broadcast('这是一条广播信息', { PayloadType: 'text' })
-      socket.send(`/${randomPath}/mobile-debug.js`, { PayloadType: 'inject' })
+      socket.send(`/${randomPath}/js/mobile-debug.js`, { PayloadType: 'inject' })
     })
   }
 

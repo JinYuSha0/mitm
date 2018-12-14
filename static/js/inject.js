@@ -29,8 +29,8 @@ if (self == top) {
       })
     }
   }
-  const observer = new Publisher()
-  function fr (blob, type) {
+  const observer = window._observer = new Publisher()
+  const fr = window._fr = (blob, type) => {
     return new Promise((resolve, reject) => {
       const fr = new FileReader()
       fr.onload = (e) => {
