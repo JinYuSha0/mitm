@@ -63,9 +63,7 @@ if (self == top) {
   }
   const textHandler = async (blob) => {
     const text = await fr(blob)
-    const div = document.createElement('div')
-    div.innerText = text
-    document.body.append(div)
+    console.log(text)
   }
   observer.subscribe('image', imageHandler)
   observer.subscribe('text', textHandler)

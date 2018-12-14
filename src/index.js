@@ -11,7 +11,7 @@ websocket(httpTunnel)
 httpTunnel.timeout = httpTunnel.keepAliveTimeout = 30000
 const port = 1111
 
-// 创建ca证书
+// 创建ca根证书
 createFakeCaCertificate()
 
 httpTunnel.listen(port, () => {
@@ -42,3 +42,7 @@ httpTunnel.on('connect', (req, cltSocket, head) => {
     })
   })
 })
+
+// ws服务
+// const ws = websocket(httpTunnel)
+// ws.on('connection', ws.handlerFunc)

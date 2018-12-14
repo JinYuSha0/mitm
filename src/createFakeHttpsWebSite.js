@@ -16,15 +16,22 @@ async function createFakeHttpsWebSite(domain, requestHandle, successFunc) {
       successFunc(address.port)
     })
 
-    websocket(fakeServer)
+    // wss服务
+    const ws = websocket(fakeServer)
+    ws.on('connection', ws.handlerFunc)
 
     fakeServer.on('request', requestHandle)
+
+    fakeServer.on('close', () => {
+      ws.close()
+    })
 
     fakeServer.on('error', (e) => {
       console.error(e)
     })
   } catch (err) {
-    // throw err
+    console.error(err)
+    throw err
   }
 }
 
