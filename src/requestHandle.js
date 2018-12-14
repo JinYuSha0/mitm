@@ -5,9 +5,9 @@ const request = require('request')
 const getRequestOptions = require('./utils/getRequestOptions')
 const decode = require('./utils/decode')
 const injectScript = require('./utils/injectScript')
-const utils = require('./utils/utils')
+const config = require('./config')
 
-const randomPath = utils.randomStr()
+const randomPath = config.randomPath
 
 module.exports = async (req, res) => {
   try {
@@ -58,7 +58,7 @@ module.exports = async (req, res) => {
             delete headers['content-security-policy']
             res.writeHead(response.statusCode, headers)
             if (body) {
-              body = injectScript(body, `/${randomPath}/inject.js`)
+              body = injectScript(body, [`/${randomPath}/inject.js`])
               res.end(body)
             } else {
               res.end('No Response Body')

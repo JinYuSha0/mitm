@@ -28,7 +28,8 @@ module.exports = (req, res) => {
           if (contentType.match('application/json')) {
             Object.assign(params, {body})
           } else if (contentType.match('application/x-www-form-urlencoded')) {
-            Object.assign(params, {form: body})
+            // fixme 好像不能用？
+            Object.assign(params, {form: querystring.parse(body)})
           } else if (contentType.match('multipart/form-data')) {
             Object.assign(params, {formData: body})
           } else {

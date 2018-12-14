@@ -1,5 +1,8 @@
 const WebSocket = require('../packages/mitm-node-websocket/src/index')
+const config = require('./config')
 const fs = require('fs')
+
+const randomPath = config.randomPath
 
 module.exports = (server) => {
   const wss = new WebSocket(server)
@@ -15,8 +18,8 @@ module.exports = (server) => {
 
   WebSocket.prototype.handlerFunc = (socket, req) => {
     socket.on('package', () => {
-      wss.broadcast('broadcast', { PayloadType: 'text' })
-      socket.send('1111', { PayloadType: 'text' })
+      wss.broadcast('这是一条广播信息', { PayloadType: 'text' })
+      socket.send(`/${randomPath}/mobile-debug.js`, { PayloadType: 'inject' })
     })
   }
 

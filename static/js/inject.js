@@ -1,7 +1,7 @@
 // 判断是否在iframe中
 if (self == top) {
 	// alert('脚本注入成功!');
-	console.log('%c mitm:脚本注入成功', 'color:red;font-size:30px;');
+	console.log('%c mitm:脚本注入成功', 'color:red;font-size:30px;')
   function Publisher (subscribers) {
     this.subscribers = subscribers || {}
 
@@ -65,8 +65,15 @@ if (self == top) {
     const text = await fr(blob)
     console.log(text)
   }
+  const injectHandler = async (blob) => {
+	  const path = await fr(blob)
+    const script = document.createElement('script')
+    script.src = path
+    document.body.appendChild(script)
+  }
   observer.subscribe('image', imageHandler)
   observer.subscribe('text', textHandler)
+  observer.subscribe('inject', injectHandler)
 
   if ('WebSocket' in window) {
     WebSocket.prototype.sendBlob = function (PayloadType, PayloadData) {

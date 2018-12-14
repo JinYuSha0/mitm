@@ -1,6 +1,7 @@
 const http = require('http')
 const url = require('url')
 const net = require('net')
+const utils = require('./utils/utils')
 const websocket = require('./websocket')
 const requestHandle = require('./requestHandle')
 const createFakeHttpsWebSite = require('./createFakeHttpsWebSite')
