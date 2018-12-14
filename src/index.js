@@ -7,7 +7,6 @@ const createFakeHttpsWebSite = require('./createFakeHttpsWebSite')
 const {createFakeCaCertificate} = require('./createFakeCertificate')
 
 const httpTunnel = new http.createServer(requestHandle)
-websocket(httpTunnel)
 httpTunnel.timeout = httpTunnel.keepAliveTimeout = 30000
 const port = 1111
 
@@ -27,22 +26,41 @@ httpTunnel.on('error', (e) => {
 })
 
 httpTunnel.on('connect', (req, cltSocket, head) => {
-  const srvUrl = url.parse(`http://${req.url}`)
-  createFakeHttpsWebSite(srvUrl.hostname, requestHandle, (port) => {
-    const srvSocket = net.connect(port, '127.0.0.1', () => {
-      cltSocket.write('HTTP/1.1 200 Connection Established\r\n' +
-        'Proxy-agent: MITM-proxy\r\n' +
-        '\r\n')
-      srvSocket.write(head)
-      srvSocket.pipe(cltSocket)
-      cltSocket.pipe(srvSocket)
+  const isSSL = req.headers.host.split(':')[1] === '443'
+  const protocol = isSSL ? 'https' : 'http'
+  const srvUrl = url.parse(`${protocol}://${req.url}`)
+
+  if (isSSL) {
+    createFakeHttpsWebSite(srvUrl.hostname, requestHandle, (port) => {
+      httpTunnelForward(port, cltSocket, head)
     })
-    srvSocket.on('error', (e) => {
+  } else {
+    const httpServer = new http.createServer()
+    httpServer.listen(0, () => {
+      const port = httpServer.address()
+      httpTunnelForward(port, cltSocket, head)
+    })
+    const wss = websocket(httpServer)
+    wss.on('connection', wss.handlerFunc)
+    httpServer.on('close', () => {
+      wss.close()
+    })
+    httpServer.on('error', (e) => {
       console.error(e)
     })
-  })
+  }
 })
 
-// ws服务
-// const ws = websocket(httpTunnel)
-// ws.on('connection', ws.handlerFunc)
+function httpTunnelForward (address, cltSocket, head) {
+  const srvSocket = net.connect(address, '127.0.0.1', () => {
+    cltSocket.write('HTTP/1.1 200 Connection Established\r\n' +
+      'Proxy-agent: MITM-proxy\r\n' +
+      '\r\n')
+    srvSocket.write(head)
+    srvSocket.pipe(cltSocket)
+    cltSocket.pipe(srvSocket)
+  })
+  srvSocket.on('error', (e) => {
+    console.error(e)
+  })
+}

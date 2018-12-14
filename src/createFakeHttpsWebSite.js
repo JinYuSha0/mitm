@@ -17,13 +17,13 @@ async function createFakeHttpsWebSite(domain, requestHandle, successFunc) {
     })
 
     // wss服务
-    const ws = websocket(fakeServer)
-    ws.on('connection', ws.handlerFunc)
+    const wss = websocket(fakeServer)
+    wss.on('connection', wss.handlerFunc)
 
     fakeServer.on('request', requestHandle)
 
     fakeServer.on('close', () => {
-      ws.close()
+      wss.close()
     })
 
     fakeServer.on('error', (e) => {
