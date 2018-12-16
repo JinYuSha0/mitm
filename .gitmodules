@@ -5,3 +5,6 @@
 [submodule "packages/system-basic-command"]
 	path = packages/system-basic-command
 	url = https://github.com/JinYuSha0/system-basic-command.git
+[submodule "packages/node-arp"]
+	path = packages/node-arp
+	url = https://github.com/JinYuSha0/node-arp.git
