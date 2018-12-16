@@ -3,6 +3,8 @@ const path = require('path')
 const forge = require('node-forge')
 const https = require('https')
 const utils = require('./utils/utils')
+const config = require('./config')
+const systemBasicCommand = require('../packages/system-basic-command/src')
 
 const pki = forge.pki
 const sslDir = path.resolve(__dirname, '../ssl')
@@ -65,27 +67,7 @@ function createFakeCaCertificate() {
     cert.validity.notBefore.setFullYear(cert.validity.notBefore.getFullYear())
     cert.validity.notAfter.setFullYear(cert.validity.notAfter.getFullYear() + 1)
 
-    const attrs = [
-      {
-        name: 'commonName',
-        value: 'sjy-self-use'
-      }, {
-        name: 'countryName',
-        value: 'CN'
-      }, {
-        shortName: 'ST',
-        value: 'GuangDong'
-      }, {
-        name: 'localityName',
-        value: 'ShenZhen'
-      }, {
-        name: 'organizationName',
-        value: 'sjy'
-      }, {
-        shortName: 'OU',
-        value: 'sjy'
-      }
-    ]
+    const attrs = config.cert
 
     cert.setSubject(attrs)
     cert.setIssuer(attrs)
@@ -111,6 +93,10 @@ function createFakeCaCertificate() {
     fs.writeFileSync(caKeyPath, keyPem)
 
     console.log(`根证书已经生成，路径:${caCertPath}，请先安装。`)
+
+    systemBasicCommand.msgBox('mitm', '请先安装根证书!', () => {
+      systemBasicCommand.fileManage(sslDir)
+    })
   }
 }
 
@@ -121,8 +107,6 @@ async function createFakeCertificate(domain) {
     if (!fs.existsSync(otherDir)) {
       fs.mkdirSync(otherDir)
     }
-
-    // todo 打开证书路径
 
     const certPath = path.join(otherDir, `/cert_${domain}.crt`)
     const keyPath = path.join(otherDir, `/key_${domain}.pem`)
@@ -145,7 +129,7 @@ async function createFakeCertificate(domain) {
       const caCert = pki.certificateFromPem(caCertPem)
       const caKey = pki.privateKeyFromPem(caKeyPem)
 
-      const keys = pki.rsa.generateKeyPair(2048)
+      const keys = pki.rsa.generateKeyPair(1024)
       const cert = pki.createCertificate()
       cert.publicKey = keys.publicKey
       // cert.serialNumber = '01'
@@ -157,28 +141,7 @@ async function createFakeCertificate(domain) {
       cert.validity.notAfter.setFullYear(cert.validity.notAfter.getFullYear() + 1)
 
       // const { subject, issuer } = await getCertificateInfo(domain)
-
-      const subject = [
-        {
-          name: 'commonName',
-          value: domain
-        }, {
-          name: 'countryName',
-          value: 'CN'
-        }, {
-          shortName: 'ST',
-          value: 'GuangDong'
-        }, {
-          name: 'localityName',
-          value: 'ShengZhen'
-        }, {
-          name: 'organizationName',
-          value: 'sjy'
-        }, {
-          shortName: 'OU',
-          value: 'sjy'
-        }
-      ]
+      const subject = config.cert.filter(i => i.name !== 'commonName').push({name: 'commonName', value: domain })
 
       // 设置发行者为根证书
       cert.setIssuer(caCert.subject.attributes)

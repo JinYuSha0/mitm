@@ -11,7 +11,7 @@ module.exports = (req, res) => {
       method: req.method,
       url: URL,
       headers: req.headers,
-      encoding: null,
+      encoding: null, // 注: 不能去除!
     }
 
     if (req.method.toLowerCase() === 'get') {
@@ -28,8 +28,8 @@ module.exports = (req, res) => {
           if (contentType.match('application/json')) {
             Object.assign(params, {body})
           } else if (contentType.match('application/x-www-form-urlencoded')) {
-            // fixme 好像不能用？
-            Object.assign(params, {form: querystring.parse(body)})
+            // fixme 好像有问题
+            Object.assign(params, {form: body})
           } else if (contentType.match('multipart/form-data')) {
             Object.assign(params, {formData: body})
           } else {

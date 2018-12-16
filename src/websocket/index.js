@@ -1,5 +1,5 @@
-const WebSocket = require('../packages/mitm-node-websocket/src/index')
-const config = require('./config')
+const WebSocket = require('../../packages/mitm-node-websocket/src/index')
+const config = require('../config')
 const fs = require('fs')
 
 const randomPath = config.randomPath

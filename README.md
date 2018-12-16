@@ -10,8 +10,8 @@
  2. 更新子模块 git submodule update
 
 ## 三.todo-list 更新于 2018/12/15
- 1. 实现system-basic-command模块
- 2. 实现mitm-node-websocket模块 ping pong
- 3. 实现一个控制后台 选型react
- 4. 实现移动端调试工具 mobile-debug
+ 1. ~~实现system-basic-command模块~~
+ 2. ~~实现mitm-node-websocket模块 ping pong~~
+ 3. 实现移动端调试工具 mobile-debug
+ 4. 实现一个控制后台 选型react
  5. 实现arp欺骗

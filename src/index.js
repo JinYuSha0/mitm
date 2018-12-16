@@ -8,7 +8,8 @@ const createFakeHttpsWebSite = require('./createFakeHttpsWebSite')
 const {createFakeCaCertificate} = require('./createFakeCertificate')
 
 const httpTunnel = new http.createServer(requestHandle)
-httpTunnel.timeout = httpTunnel.keepAliveTimeout = 30000
+// 注: keepAliveTimeout 超时后会导致websocket也断开连接 0为永不超时
+httpTunnel.timeout = httpTunnel.keepAliveTimeout = 0
 const port = 1111
 
 // 创建ca根证书

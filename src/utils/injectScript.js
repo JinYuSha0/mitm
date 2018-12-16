@@ -6,11 +6,10 @@ module.exports = function injectScript(content, scriptSrc) {
   const cspReg = new RegExp(/<meta[\s\S]+Content-Security-Policy[\s\S]+>/gi)
   // CSP影响脚本加载 去除 Content-Security-Policy meta头
   content = content.replace(cspReg, '')
-  const bodyReg = new RegExp(/([\s\S]+)<\/body>([\s\S]+)/)
-  const bodyMatch = content.match(bodyReg)
-  if (bodyMatch) {
+  const headMatch = content.match(/([\s\S]+)<head>([\s\S]+)/)
+  if (headMatch) {
     let html = ''
-    html += bodyMatch[1]
+    html += headMatch[1]
     if (Object.getPrototypeOf(scriptSrc) === Array.prototype) {
       scriptSrc.forEach(src => {
         html += `<script src="${src}"><\/script>\n`
@@ -18,7 +17,7 @@ module.exports = function injectScript(content, scriptSrc) {
     } else {
       html += `<script src="${scriptSrc}"><\/script>\n`
     }
-    html += '</body>' + bodyMatch[2]
+    html += '</body>' + headMatch[2]
     return html
   } else {
     return content
