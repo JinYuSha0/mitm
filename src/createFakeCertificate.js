@@ -141,7 +141,8 @@ async function createFakeCertificate(domain) {
       cert.validity.notAfter.setFullYear(cert.validity.notAfter.getFullYear() + 1)
 
       // const { subject, issuer } = await getCertificateInfo(domain)
-      const subject = config.cert.filter(i => i.name !== 'commonName').push({name: 'commonName', value: domain })
+      const subject = config.cert.filter(i => (i.name !== 'commonName'))
+      subject.unshift({ name: 'commonName', value: domain })
 
       // 设置发行者为根证书
       cert.setIssuer(caCert.subject.attributes)
